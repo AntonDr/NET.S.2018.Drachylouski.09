@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AccountNS;
+using AccountNumberGeneratorLogic;
 using BancAccountLogic;
+using DAL;
 using ExchangeRateNBRB.Model;
 
 namespace BankAccountProgram
@@ -12,31 +15,36 @@ namespace BankAccountProgram
     {
         static void Main(string[] args)
         {
-            var bankAcc = new BankAccount("Anton","Drachylouski",new DateTime(1999,12,8));
-            bankAcc.CreateNewBankScore(120,TypeOfBankScore.Gold);
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
-            bankAcc.Deposit(1400.3M);
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
-            bankAcc.Withdraw(20.6M);
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
-            Console.WriteLine(bankAcc.ConvertTo(CurrencyCode.USD));
-            bankAcc.CreateNewBankScore(120444);
-            bankAcc.SelectCurrentBankScore(2);
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
-            bankAcc.DeleteScore(1);
-            bankAcc.CreateNewBankScore(293919931,TypeOfBankScore.Gold);
-            int id = bankAcc.CurrentScoreId();
-            Console.WriteLine(bankAcc.CountOfScores);
-            Console.WriteLine(bankAcc.CurrentScoreId());
-            Console.WriteLine(bankAcc.CurrentScoreId());
-            bankAcc.SelectCurrentBankScore(id);
-            Console.WriteLine(bankAcc.CurrentScoreId());
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
-            Console.WriteLine(bankAcc.CountOfScores);
-            bankAcc.DeleteScore(new BankScore(293919931, TypeOfBankScore.Gold));
-            Console.WriteLine(bankAcc.CountOfScores);
-            Console.WriteLine(bankAcc.CurrentScoreBalance());
 
+            Service bankService = new Service(new FakeRepository());
+
+            AccountHolder accountHolder = new AccountHolder("Anton","Drachylouski","anton.drachylouski@gmail.com");
+
+            bankService.OpenAccount(new NumberGeneratorByHashCode(), accountHolder,TypeOfBankScore.Gold);
+
+            string id = accountHolder.ListOfAccounts.First();
+
+            bankService.Deposite(id,12882);
+
+            bankService.Withdraw(id,999m);
+
+            bankService.OpenAccount(new NumberGeneratorByHashCode(),accountHolder,TypeOfBankScore.Platinum);
+
+            id = accountHolder.ListOfAccounts.Last();
+
+            bankService.Withdraw(id,1200m);
+
+            bankService.CloseAccount(id);
+
+            AccountHolder accountHolder1 = new AccountHolder("Vova", "Sidorov", "vova.sidorov@mail.ru");
+
+            bankService.OpenAccount(new NumberGeneratorByHashCode(),accountHolder1,TypeOfBankScore.Base );
+
+            id = accountHolder1.ListOfAccounts.Last();
+
+            bankService.Deposite(id,11111111m);
+
+            bankService.CloseAccount(id);
         }
     }
 }
