@@ -1,28 +1,42 @@
-﻿using System;
+﻿using MatrixSortTools;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MatrixSortTools
+namespace MatrixFilter
 {
-    /// <summary>
-    /// Class for work with matrix
-    /// </summary>
     public static class MatrixExtention
     {
+
         /// <summary>
-        /// Filter matrix by given compaper
+        /// Filters the specified comparer.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array">The array.</param>
         /// <param name="comparer">The comparer.</param>
-        public static void Filter<T>(this T[] array, IComparer<T> comparer)
+        public static void Filter<T>(this T[] array, Func<T,T,int> comparer)
         {
-            Validate(array, comparer);
+            void Validate()
+            {
+                if (array == null)
+                {
+                    throw new ArgumentNullException();
+                }
 
-            array.Filter(comparer.Compare);
+                if (array.Length == 0)
+                {
+                    throw new ArgumentException();
+                }
+
+                if (comparer == null)
+                {
+                    throw new ArgumentNullException();
+                }
+            }
+
+            array.Filter(new Adapter<T>(comparer));
         }
 
         /// <summary>
@@ -31,25 +45,10 @@ namespace MatrixSortTools
         /// <typeparam name="T"></typeparam>
         /// <param name="array">The array.</param>
         /// <param name="comparer">The comparer.</param>
-        public static void Filter<T>(this T[] array, Func<T,T, int> comparer)
+        public static void Filter<T>(this T[] array, IComparer<T> comparer)
         {
-            void Validate()
-            {
-                if (array==null)
-                {
-                    throw new ArgumentNullException();
-                }
-
-                if (array.Length==0)
-                {
-                    throw new ArgumentException();
-                }
-
-                if (comparer==null)
-                {
-                    throw new ArgumentNullException();
-                }
-            }
+            Validate(array, comparer);
+            
 
             bool flag = true;
 
@@ -59,7 +58,7 @@ namespace MatrixSortTools
 
                 for (int i = 0; i < array.Length - 1; i++)
                 {
-                    if (comparer(array[i], array[i + 1]) > 0)
+                    if (comparer.Compare(array[i], array[i + 1]) > 0)
                     {
                         Swap(ref array[i], ref array[i + 1]);
                         flag = true;
@@ -110,4 +109,23 @@ namespace MatrixSortTools
             }
         }
     }
+
+    /// <summary>
+    /// Class-adapter for delegate
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <seealso cref="System.Collections.Generic.IComparer{T}" />
+    public class Adapter<T> : IComparer<T>
+    {
+        private Func<T, T, int> comparer;
+
+
+        public Adapter(Func<T, T, int> comparer)
+        {
+            this.comparer = comparer ?? throw new ArgumentNullException();
+        }
+
+        public int Compare(T x, T y) => comparer(x, y);
+    }
 }
+

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using MatrixSortTools;
 using NUnit.Framework.Constraints;
@@ -69,6 +70,24 @@ namespace NUnitMatrixFillterTest
             expected[0] = new int[] { 0, 122, -481 };
 
             CollectionAssert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void Delegaate()
+        {
+            int[][] matrix = new int[3][];
+            matrix[0] = null;
+            matrix[1] = new int[] { 11, 2, -3, 5, 99 };
+            matrix[2] = new int[] { 0, 122, -481 };
+
+            matrix.Filter(new GrowingMinElementComparer().Compare);
+
+            int[][] expected = new int[3][];
+            expected[0] = null;
+            expected [2] = new int[] { 11, 2, -3, 5, 99 };
+            expected[1] = new int[] { 0, 122, -481 };
+
+            CollectionAssert.AreEqual(matrix, expected);
         }
     }
 }
