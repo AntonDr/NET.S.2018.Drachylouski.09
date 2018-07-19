@@ -8,10 +8,39 @@ namespace AccountNS
     /// <seealso cref="Account" />
     public abstract class Account:IEquatable<Account>
     {
+        #region Private fields
         /// <summary>
         /// The balance
         /// </summary>
         private decimal balance;
+
+        /// <summary>
+        /// The bonus points
+        /// </summary>
+        private int bonusPoints;
+        #endregion
+
+        #region Ctor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Account"/> class.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="accountHolder">The account holder.</param>
+        public Account(string id, AccountHolder accountHolder)
+        {
+            this.Holder = accountHolder;
+            Id = id;
+        }
+        #endregion
+
+        #region Proreties
+        /// <summary>
+        /// Gets the identifier.
+        /// </summary>
+        /// <value>
+        /// The identifier.
+        /// </value>
+        public string Id { get; private set; }
 
         /// <summary>
         /// Gets the holder.
@@ -20,30 +49,6 @@ namespace AccountNS
         /// The holder.
         /// </value>
         public AccountHolder Holder { get; private set; }
-
-        /// <summary>
-        /// The bonus points
-        /// </summary>
-        private int bonusPoints;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Account"/> class.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <param name="accountHolder">The account holder.</param>
-        public Account(string id,AccountHolder accountHolder)
-        {
-            this.Holder = accountHolder;
-            Id = id;
-        }
-
-        /// <summary>
-        /// Gets the identifier.
-        /// </summary>
-        /// <value>
-        /// The identifier.
-        /// </value>
-        public string Id { get;private set; }
 
         /// <summary>
         /// Gets or sets the status.
@@ -64,7 +69,7 @@ namespace AccountNS
             get => bonusPoints;
             private set
             {
-                if (value<=0)
+                if (value <= 0)
                 {
                     bonusPoints = 0;
                 }
@@ -93,11 +98,13 @@ namespace AccountNS
                 {
                     throw new ArgumentException("Invalid data");
                 }
-               
+
 
             }
         }
+        #endregion
 
+        #region Public methods
         /// <summary>
         /// Deposites the specified value.
         /// </summary>
@@ -105,13 +112,13 @@ namespace AccountNS
         /// <exception cref="System.ArgumentException">value</exception>
         public void Deposite(decimal value)
         {
-            if (value<=0)
+            if (value <= 0)
             {
                 throw new ArgumentException($"{nameof(value)} can't be not-positive");
             }
 
             Balance += value;
-            BonusPoints+=BonusСalculation(value);
+            BonusPoints += BonusСalculation(value);
         }
 
         /// <summary>
@@ -138,14 +145,16 @@ namespace AccountNS
         /// <returns></returns>
         public bool Equals(Account account)
         {
-            if (account==null) return false;
-            if (account==this) return true;
+            if (account == null) return false;
+            if (account == this) return true;
             if (account.GetType() != this.GetType()) return false;
 
             return Balance == account.Balance && Status == account.Status && Id == account.Id &&
                    BonusPoints == account.BonusPoints;
         }
+        #endregion
 
+        #region Abstract protected methods
         /// <summary>
         /// Bonuses the сalculation.
         /// </summary>
@@ -159,6 +168,7 @@ namespace AccountNS
         /// <returns>
         ///   <c>true</c> if [is valid value] [the specified value]; otherwise, <c>false</c>.
         /// </returns>
-        protected abstract bool IsValidValue(decimal value);
+        protected abstract bool IsValidValue(decimal value); 
+        #endregion
     }
 }
